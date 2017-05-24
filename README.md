@@ -18,16 +18,16 @@ mvn install:install-file -Dfile=path/to/your/nps_sdk.jar -DgroupId=ar.com.nps -D
 It's a basic configuration of the SDK
 
 ```Java
-import IngenicoSDK.ConsoleLogger;
-import IngenicoSDK.ILogger;
-import IngenicoSDK.NpsSdk;
-import IngenicoSDK.WsdlHandlerConfiguration;
-import IngenicoSDK.ILogger.LogLevel;
-import IngenicoSDK.WsdlHandlerConfiguration.IngenicoEnvironment;
-import IngenicoSDK.WsdlHandlerException;
+import NpsSDK.ConsoleLogger;
+import NpsSDK.ILogger;
+import NpsSDK.NpsSdk;
+import NpsSDK.WsdlHandlerConfiguration;
+import NpsSDK.ILogger.LogLevel;
+import NpsSDK.WsdlHandlerConfiguration.NpsEnvironment;
+import NpsSDK.WsdlHandlerException;
 
 ILogger consoleLogger = new ConsoleLogger();
-WsdlHandlerConfiguration wsdlHandlerConfiguration = new WsdlHandlerConfiguration(LogLevel.DEBUG, IngenicoEnvironment.sandbox, "_YOUR_SECRET_KEY_", consoleLogger);      
+WsdlHandlerConfiguration wsdlHandlerConfiguration = new WsdlHandlerConfiguration(LogLevel.DEBUG, NpsEnvironment.sandbox, "_YOUR_SECRET_KEY_", consoleLogger);      
 NpsSdk npsSdk = null;
 try {
 	npsSdk = new NpsSdk(wsdlHandlerConfiguration);
@@ -41,10 +41,10 @@ catch (WsdlHandlerException ex) {
 Here is an simple example request:
 
 ```Java
-import IngenicoSDK.ComplexElement;
-import IngenicoSDK.ComplexElementArray;
-import IngenicoSDK.ComplexElementArrayItem;
-import IngenicoSDK.WsdlHandlerException;
+import NpsSDK.ComplexElement;
+import NpsSDK.ComplexElementArray;
+import NpsSDK.ComplexElementArrayItem;
+import NpsSDK.WsdlHandlerException;
 
 RootElement rootElement = null;
 RootElement response = null;
@@ -78,7 +78,7 @@ catch (WsdlHandlerException ex) {
 
 ```Java
 
-import IngenicoSDK.WsdlHandlerConfiguration.IngenicoEnvironment;
+import NpsSDK.WsdlHandlerConfiguration.NpsEnvironment;
 
 ```
 
@@ -87,7 +87,7 @@ import IngenicoSDK.WsdlHandlerConfiguration.IngenicoEnvironment;
 WsdlHandlerException: This exception is thrown when occurs any error. 
 
 ```Java
-import IngenicoSDK.WsdlHandlerException;
+import NpsSDK.WsdlHandlerException;
 
 //Code
 try {
@@ -103,26 +103,26 @@ catch (WsdlHandlerException ex) {
 Nps SDK allows you to log what’s happening with you request inside of our SDK, it logs by default to the java console
 
 ```Java
-import IngenicoSDK.ConsoleLogger;
-import IngenicoSDK.ILogger;
-import IngenicoSDK.WsdlHandlerConfiguration;
-import IngenicoSDK.ILogger.LogLevel;
-import IngenicoSDK.WsdlHandlerConfiguration.IngenicoEnvironment;
+import NpsSDK.ConsoleLogger;
+import NpsSDK.ILogger;
+import NpsSDK.WsdlHandlerConfiguration;
+import NpsSDK.ILogger.LogLevel;
+import NpsSDK.WsdlHandlerConfiguration.NpsEnvironment;
 
 ILogger consoleLogger = new ConsoleLogger();
-WsdlHandlerConfiguration wsdlHandlerConfiguration = new WsdlHandlerConfiguration(LogLevel.DEBUG, IngenicoEnvironment.sandbox, "_YOUR_SECRET_KEY_", consoleLogger);      
+WsdlHandlerConfiguration wsdlHandlerConfiguration = new WsdlHandlerConfiguration(LogLevel.DEBUG, NpsEnvironment.sandbox, "_YOUR_SECRET_KEY_", consoleLogger);      
 
 ```
 If you prefer the sdk can write the output generated from the logger to the file you provided.
 ```Java
-import IngenicoSDK.FileLogger;
-import IngenicoSDK.ILogger;
-import IngenicoSDK.WsdlHandlerConfiguration;
-import IngenicoSDK.ILogger.LogLevel;
-import IngenicoSDK.WsdlHandlerConfiguration.IngenicoEnvironment;
+import NpsSDK.FileLogger;
+import NpsSDK.ILogger;
+import NpsSDK.WsdlHandlerConfiguration;
+import NpsSDK.ILogger.LogLevel;
+import NpsSDK.WsdlHandlerConfiguration.NpsEnvironment;
 
 ILogger fileLogger = new FileLogger("path/to/your/file.log");
-WsdlHandlerConfiguration wsdlHandlerConfiguration = new WsdlHandlerConfiguration(LogLevel.DEBUG, IngenicoEnvironment.sandbox, "_YOUR_SECRET_KEY_", fileLogger);      
+WsdlHandlerConfiguration wsdlHandlerConfiguration = new WsdlHandlerConfiguration(LogLevel.DEBUG, NpsEnvironment.sandbox, "_YOUR_SECRET_KEY_", fileLogger);      
 ```
 
 The LogLevel.Info level will write concise information of the request and will mask sensitive data of the request. 
@@ -133,32 +133,32 @@ The LogLevel.Debug level will write information about the request to let develop
 you can change the open timeout and the read timeout of the request.
 
 ```Java
-import IngenicoSDK.ConsoleLogger;
-import IngenicoSDK.ILogger;
-import IngenicoSDK.WsdlHandlerConfiguration;
-import IngenicoSDK.ILogger.LogLevel;
-import IngenicoSDK.WsdlHandlerConfiguration.IngenicoEnvironment;
+import NpsSDK.ConsoleLogger;
+import NpsSDK.ILogger;
+import NpsSDK.WsdlHandlerConfiguration;
+import NpsSDK.ILogger.LogLevel;
+import NpsSDK.WsdlHandlerConfiguration.NpsEnvironment;
 
 ILogger consoleLogger = new ConsoleLogger();
 
 int openTimeOut = 60;
 int readTimeOut = 60;
-WsdlHandlerConfiguration wsdlHandlerConfiguration = new WsdlHandlerConfiguration(LogLevel.DEBUG, IngenicoEnvironment.sandbox, "_YOUR_SECRET_KEY_", consoleLogger,openTimeOut,readTimeOut);      
+WsdlHandlerConfiguration wsdlHandlerConfiguration = new WsdlHandlerConfiguration(LogLevel.DEBUG, NpsEnvironment.sandbox, "_YOUR_SECRET_KEY_", consoleLogger,openTimeOut,readTimeOut);      
 ```
 
 Proxy configuration
 
 ```Java
-import IngenicoSDK.ConsoleLogger;
-import IngenicoSDK.ILogger;
-import IngenicoSDK.WsdlHandlerConfiguration;
-import IngenicoSDK.ILogger.LogLevel;
-import IngenicoSDK.WsdlHandlerConfiguration.IngenicoEnvironment;
+import NpsSDK.ConsoleLogger;
+import NpsSDK.ILogger;
+import NpsSDK.WsdlHandlerConfiguration;
+import NpsSDK.ILogger.LogLevel;
+import NpsSDK.WsdlHandlerConfiguration.NpsEnvironment;
 
 ILogger consoleLogger = new ConsoleLogger();
 
 int openTimeOut = 60;
 int readTimeOut = 60;
 HttpHost proxy = new HttpHost("PROXY HOST", 8080);
-WsdlHandlerConfiguration wsdlHandlerConfiguration = new WsdlHandlerConfiguration(LogLevel.DEBUG, IngenicoEnvironment.sandbox, "_YOUR_SECRET_KEY_", consoleLogger,openTimeOut,readTimeOut,proxy);      
+WsdlHandlerConfiguration wsdlHandlerConfiguration = new WsdlHandlerConfiguration(LogLevel.DEBUG, NpsEnvironment.sandbox, "_YOUR_SECRET_KEY_", consoleLogger,openTimeOut,readTimeOut,proxy);      
 ```
