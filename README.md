@@ -1,17 +1,19 @@
-# Java SDK
+#  Java SDK
+ 
+##  Java SDK
 
 
-## Availability
+##  Availability
 Supports Java 6, 7 and 8
 
 
-## How to install
+##  How to install
 
 ```
 mvn install:install-file -Dfile=path/to/your/nps_sdk.jar -DgroupId=ar.com.nps -DartifactId=nps_sdk -Dpackaging=jar
 ```
 
-## Configuration
+##  Configuration
 
 It's a basic configuration of the SDK
 
@@ -72,7 +74,7 @@ catch (WsdlHandlerException ex) {
 
 ```
 
-## Environments
+##  Environments
 
 ```Java
 
@@ -80,7 +82,7 @@ import IngenicoSDK.WsdlHandlerConfiguration.IngenicoEnvironment;
 
 ```
 
-## Error handling
+##  Error handling
 
 WsdlHandlerException: This exception is thrown when occurs any error. 
 
@@ -96,7 +98,7 @@ catch (WsdlHandlerException ex) {
 }  
 ```
 
-## Advanced configurations
+##  Advanced configurations
 
 Nps SDK allows you to log what’s happening with you request inside of our SDK, it logs by default to the java console
 
