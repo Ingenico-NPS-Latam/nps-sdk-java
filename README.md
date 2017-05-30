@@ -1,19 +1,18 @@
-#  Java SDK
- 
-##  Java SDK
+# Java SDK
 
 
-##  Availability
+
+## Availability
 Supports Java 6, 7 and 8
 
 
-##  How to install
+## How to install
 
 ```
 mvn install:install-file -Dfile=path/to/your/nps_sdk.jar -DgroupId=ar.com.nps -DartifactId=nps_sdk -Dpackaging=jar
 ```
 
-##  Configuration
+## Configuration
 
 It's a basic configuration of the SDK
 
@@ -46,27 +45,27 @@ import NpsSDK.ComplexElementArray;
 import NpsSDK.ComplexElementArrayItem;
 import NpsSDK.WsdlHandlerException;
 
-RootElement rootElement = null;
+RootElement data = null;
 RootElement response = null;
 
 try {
-	new RootElement();
-	rootElement.add("psp_Version", "2.2" );
-	rootElement.add("psp_MerchantId", PSPMERCHANTID );
-	rootElement.add("psp_TxSource", "WEB" );
-	rootElement.add("psp_MerchTxRef", "ORDER69461-3" );
-	rootElement.add("psp_MerchOrderId", "ORDER69461" );
-	rootElement.add("psp_Amount", "15050" );
-	rootElement.add("psp_NumPayments", "1" );
-	rootElement.add("psp_Currency", "032" );
-	rootElement.add("psp_Country", "ARG" );
-	rootElement.add("psp_Product", "14" );
-	rootElement.add("psp_CardNumber", "4507990000000010" );
-	rootElement.add("psp_CardExpDate", "1612" );
-	rootElement.add("psp_PosDateTime", "2016-12-01 12:00:00");
-	rootElement.add("psp_CardSecurityCode", "325" );	
+	data = new RootElement();
+	data.add("psp_Version", "2.2" );
+	data.add("psp_MerchantId", PSPMERCHANTID );
+	data.add("psp_TxSource", "WEB" );
+	data.add("psp_MerchTxRef", "ORDER69461-3" );
+	data.add("psp_MerchOrderId", "ORDER69461" );
+	data.add("psp_Amount", "15050" );
+	data.add("psp_NumPayments", "1" );
+	data.add("psp_Currency", "032" );
+	data.add("psp_Country", "ARG" );
+	data.add("psp_Product", "14" );
+	data.add("psp_CardNumber", "4507990000000010" );
+	data.add("psp_CardExpDate", "1612" );
+	data.add("psp_PosDateTime", "2016-12-01 12:00:00");
+	data.add("psp_CardSecurityCode", "325" );	
 
-	response = npsSdk.payOnLine_2p(rootElement);
+	response = npsSdk.payOnLine_2p(data);
 } 
 catch (WsdlHandlerException ex) {	
 	//Code to handle error
@@ -74,7 +73,7 @@ catch (WsdlHandlerException ex) {
 
 ```
 
-##  Environments
+## Environments
 
 ```Java
 
@@ -82,7 +81,7 @@ import NpsSDK.WsdlHandlerConfiguration.NpsEnvironment;
 
 ```
 
-##  Error handling
+## Error handling
 
 WsdlHandlerException: This exception is thrown when occurs any error. 
 
@@ -98,7 +97,7 @@ catch (WsdlHandlerException ex) {
 }  
 ```
 
-##  Advanced configurations
+## Advanced configurations
 
 Nps SDK allows you to log what’s happening with you request inside of our SDK, it logs by default to the java console
 
