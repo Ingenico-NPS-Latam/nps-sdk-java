@@ -29,7 +29,7 @@ import org.xml.sax.InputSource;
 
 import NpsSDK.ILogger.LogLevel;
 
-public class ServiceDefinition {
+class ServiceDefinition {
 
 	// Attributes
 
@@ -140,81 +140,95 @@ public class ServiceDefinition {
 									.compareTo(dataChildren.get(dataCounter).getName()));
 
 			if (compare < 0) {
-				if (nodeChildren.get(nodeCounter).isMandatory()) {
-					errors.add("Missing field: " + path + nodeChildren.get(nodeCounter).getNodeName());
-				}
-
-				if (nodeChildren.get(nodeCounter).getNodeName().equals("psp_SecureHash") && data instanceof RootElement
-						&& !isPspClientSessionInDataChildren(data)) {
-					data.getChildren().add(new SimpleElement("psp_SecureHash",
-							((RootElement) data).secureHash(_wsdlHandlerConfiguration.getSecretKey())));
-				}
-				if (nodeChildren.get(nodeCounter).getNodeName().equals("SdkInfo")) {
-					data.getChildren().add(new SimpleElement("SdkInfo", NpsSdk.sdkVersion));
-				}
+				validateMissingField(data, nodeChildren, path, nodeCounter, errors);
 				nodeCounter++;
 				continue;
 			}
 			if (compare > 0) {
-				// errors.add("No matching field: " +
-				// dataChildren.get(dataCounter).getName());
 				data.getChildren().remove(dataChildren.get(dataCounter));
 				dataCounter++;
 				continue;
 			}
+			
+			validateMatchingField(dataChildren, nodeChildren, dataCounter, nodeCounter, parentNode, path, errors);
 
-			if (!nodeChildren.get(nodeCounter).isSimpleType() != dataChildren
-					.get(dataCounter) instanceof ComplexElement) {
-
-				if (!nodeChildren.get(nodeCounter).isArray()
-						|| (dataChildren.get(dataCounter) instanceof ComplexElementArray == false
-								&& dataChildren.get(dataCounter) instanceof SimpleElementArray == false)) {
-					errors.add("Wrong field type: " + dataChildren.get(dataCounter).getName());
-				} else {
-					if (nodeChildren.get(nodeCounter).isArray()) {
-						if(dataChildren.get(dataCounter) instanceof ComplexElementArray){
-							((ComplexElementArray) dataChildren.get(dataCounter)).setChildType(nodeChildren.get(nodeCounter).getArrayBaseType().getNodeType());
-						}
-						for (int i = 0; i < dataChildren.get(dataCounter).getChildren().size(); i++) {
-							BaseElement arrayElement = dataChildren.get(dataCounter).getChildren().get(i);
-							if (arrayElement instanceof ComplexElementArrayItem == nodeChildren.get(nodeCounter)
-									.getArrayBaseType().isSimpleType()) {
-								errors.add("Wrong type in array: " + path + dataChildren.get(dataCounter).getName());
-							} else {
-								List<String> innerErrors = new ArrayList<String>();
-								if (!validate(arrayElement, nodeChildren.get(nodeCounter).getArrayBaseType(),
-										String.format("{0}{1}[{2}] --> ", path,
-												nodeChildren.get(nodeCounter).getNodeName(), i),
-										innerErrors)) {
-									errors.addAll(innerErrors);
-								}
-							}
-						}
-					}
-				}
-			} else if (!nodeChildren.get(nodeCounter).isSimpleType()) {
-				List<String> innerErrors = new ArrayList<String>();
-				validate(dataChildren.get(dataCounter), nodeChildren.get(nodeCounter),
-						String.format("{0}{1} --> ", path, nodeChildren.get(nodeCounter).getNodeName()), innerErrors);
-				errors.addAll(innerErrors);
-			} else {
-				if (!isStringNullOrWhiteSpace(parentNode.getNodeName())) {
-					SimpleElement simpleElement = (dataChildren.get(dataCounter) instanceof SimpleElement
-							? (SimpleElement) dataChildren.get(dataCounter) : null);
-					if (simpleElement != null) {
-						String key = String.format("%1$s.%2$s", parentNode.getNodeName(), simpleElement.getName());
-
-						if (NpsSdk.fieldsMaxLength.containsKey(key)) {
-							simpleElement.trim(NpsSdk.fieldsMaxLength.get(key));
-						}
-					}
-				}
-			}
 			dataCounter++;
 			nodeCounter++;
 		}
 
 		return errors.size() == 0;
+	}
+
+	private void validateMatchingField(List<BaseElement> dataChildren, List<Node> nodeChildren, int dataCounter,
+			int nodeCounter, Node parentNode, String path, List<String> errors) throws WsdlHandlerException {
+		if (!nodeChildren.get(nodeCounter).isSimpleType() != dataChildren.get(dataCounter) instanceof ComplexElement) {
+
+			if (!nodeChildren.get(nodeCounter).isArray()
+					|| (dataChildren.get(dataCounter) instanceof ComplexElementArray == false
+							&& dataChildren.get(dataCounter) instanceof SimpleElementArray == false)) {
+				errors.add("Wrong field type: " + dataChildren.get(dataCounter).getName());
+			} else {
+				if (nodeChildren.get(nodeCounter).isArray()) {
+					if (dataChildren.get(dataCounter) instanceof ComplexElementArray) {
+						((ComplexElementArray) dataChildren.get(dataCounter))
+								.setChildType(nodeChildren.get(nodeCounter).getArrayBaseType().getNodeType());
+					}
+					for (int i = 0; i < dataChildren.get(dataCounter).getChildren().size(); i++) {
+						BaseElement arrayElement = dataChildren.get(dataCounter).getChildren().get(i);
+						if (arrayElement instanceof ComplexElementArrayItem == nodeChildren.get(nodeCounter)
+								.getArrayBaseType().isSimpleType()) {
+							errors.add("Wrong type in array: " + path + dataChildren.get(dataCounter).getName());
+						} else {
+							List<String> innerErrors = new ArrayList<String>();
+							if (!validate(arrayElement, nodeChildren.get(nodeCounter).getArrayBaseType(), String
+									.format("{0}{1}[{2}] --> ", path, nodeChildren.get(nodeCounter).getNodeName(), i),
+									innerErrors)) {
+								errors.addAll(innerErrors);
+							}
+						}
+					}
+				}
+			}
+		} else if (!nodeChildren.get(nodeCounter).isSimpleType()) {
+			List<String> innerErrors = new ArrayList<String>();
+			validate(dataChildren.get(dataCounter), nodeChildren.get(nodeCounter),
+					String.format("{0}{1} --> ", path, nodeChildren.get(nodeCounter).getNodeName()), innerErrors);
+			errors.addAll(innerErrors);
+		} else {
+			if (!isStringNullOrWhiteSpace(parentNode.getNodeName())) {
+				SimpleElement simpleElement = (dataChildren.get(dataCounter) instanceof SimpleElement
+						? (SimpleElement) dataChildren.get(dataCounter) : null);
+				if (simpleElement != null) {
+					String key = String.format("%1$s.%2$s", parentNode.getNodeName(), simpleElement.getName());
+
+					if (NpsSdk.fieldsMaxLength.containsKey(key)) {
+						simpleElement.trim(NpsSdk.fieldsMaxLength.get(key));
+					}
+				}
+			}
+		}
+	}
+
+	private void validateMissingField(BaseElement data, List<Node> nodeChildren, String path, int nodeCounter,
+			List<String> errors) throws WsdlHandlerException {
+		if (nodeChildren.get(nodeCounter).isMandatory()) {
+			errors.add("Missing field: " + path + nodeChildren.get(nodeCounter).getNodeName());
+		}
+
+		if (nodeChildren.get(nodeCounter).getNodeName().equals("psp_SecureHash") && data instanceof RootElement
+				&& !isPspClientSessionInDataChildren(data)) {
+			data.getChildren().add(new SimpleElement("psp_SecureHash",
+					((RootElement) data).secureHash(_wsdlHandlerConfiguration.getSecretKey())));
+		}
+		if (nodeChildren.get(nodeCounter).getNodeName().equals("SdkInfo")) {
+			data.getChildren().add(new SimpleElement("SdkInfo", NpsSdk.sdkVersion));
+		}
+		if (data instanceof ComplexElement
+				&& nodeChildren.get(nodeCounter).getNodeName().equals("psp_MerchantAdditionalDetails")) {
+			ComplexElement complexElement = new ComplexElement();
+			complexElement.add("SdkInfo", NpsSdk.sdkVersion);
+			((ComplexElement) data).add("psp_MerchantAdditionalDetails", complexElement);
+		}
 	}
 
 	private Boolean isPspClientSessionInDataChildren(BaseElement data) {

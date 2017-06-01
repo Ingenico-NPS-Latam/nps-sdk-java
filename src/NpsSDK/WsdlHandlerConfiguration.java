@@ -2,19 +2,7 @@ package NpsSDK;
 
 import org.apache.http.HttpHost;
 
-public class WsdlHandlerConfiguration {
-	
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="logLevel"></param>
-    /// <param name="NpsEnvironment"></param>
-    /// <param name="secretKey"></param>
-    /// <param name="logger"></param>
-    /// <param name="openTimeOut">The number of seconds to wait before the request times out. The default value is 100 seconds</param>
-	/// <param name="readTimeOut">The number of seconds to wait before the socket times out. The default value is 0 seconds interpreted as infinite</param>
-    /// <param name="proxy"></param> 
-	
+public class WsdlHandlerConfiguration {	
 	
     public enum NpsEnvironment
     {
@@ -31,6 +19,11 @@ public class WsdlHandlerConfiguration {
 	private HttpHost proxy;
 	
 	
+	/**	 
+	 * @param  logLevel
+	 * @param  npsEnvironment
+	 * @param  secretKey
+	 */
 	
 	public WsdlHandlerConfiguration(NpsSDK.ILogger.LogLevel logLevel, NpsEnvironment npsEnvironment, String secretKey){
 		this.logLevel = logLevel;
@@ -43,6 +36,12 @@ public class WsdlHandlerConfiguration {
 		
 	}
 	
+	/**	 
+	 * @param  logLevel
+	 * @param  npsEnvironment
+	 * @param  secretKey
+	 * @param  logger
+	 */
 	
 	public WsdlHandlerConfiguration(NpsSDK.ILogger.LogLevel logLevel, NpsEnvironment npsEnvironment, String secretKey, ILogger logger){
 		this.logLevel = logLevel;
@@ -55,6 +54,15 @@ public class WsdlHandlerConfiguration {
 		
 	}
 	
+	/**	 
+	 * @param  logLevel
+	 * @param  npsEnvironment
+	 * @param  secretKey
+	 * @param  logger
+	 * @param  openTimeOut The number of seconds to wait before the request times out. The default value is 100 seconds
+	 * @param  readTimeOut The number of seconds to wait before the socket times out. The default value is 0 seconds interpreted as infinite
+	 */
+	
 	public WsdlHandlerConfiguration(NpsSDK.ILogger.LogLevel logLevel, NpsEnvironment npsEnvironment, String secretKey, ILogger logger, int openTimeOut, int readTimeOut){
 		this.logLevel = logLevel;
 		this.npsEnvironment = npsEnvironment;
@@ -65,6 +73,15 @@ public class WsdlHandlerConfiguration {
 		this.proxy = null;
 	}
 	
+	/**	 
+	 * @param  logLevel
+	 * @param  npsEnvironment
+	 * @param  secretKey
+	 * @param  logger
+	 * @param  openTimeOut The number of seconds to wait before the request times out. The default value is 100 seconds
+	 * @param  readTimeOut The number of seconds to wait before the socket times out. The default value is 0 seconds interpreted as infinite
+	 * @param  proxy
+	 */
 	public WsdlHandlerConfiguration(NpsSDK.ILogger.LogLevel logLevel, NpsEnvironment npsEnvironment, String secretKey, ILogger logger, int openTimeOut, int readTimeOut, HttpHost proxy){
 		this.logLevel = logLevel;
 		this.npsEnvironment = npsEnvironment;
@@ -77,11 +94,11 @@ public class WsdlHandlerConfiguration {
 	}
 	
 	
-	public NpsEnvironment getNpsEnvironment(){
+	NpsEnvironment getNpsEnvironment(){
 		return npsEnvironment;
 	}	
 	
-	public NpsSDK.ILogger.LogLevel getLogLevel(){
+	NpsSDK.ILogger.LogLevel getLogLevel(){
 		return logLevel;
 	}
 

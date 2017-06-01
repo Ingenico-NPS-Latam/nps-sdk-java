@@ -1,22 +1,22 @@
-# Java SDK
+#  java SDK
+ 
 
 
+##  Availability
+Supports java 6, 7 and 8
 
-## Availability
-Supports Java 6, 7 and 8
 
-
-## How to install
+##  How to install
 
 ```
 mvn install:install-file -Dfile=path/to/your/nps_sdk.jar -DgroupId=ar.com.nps -DartifactId=nps_sdk -Dpackaging=jar
 ```
 
-## Configuration
+##  Configuration
 
 It's a basic configuration of the SDK
 
-```Java
+```java
 import NpsSDK.ConsoleLogger;
 import NpsSDK.ILogger;
 import NpsSDK.NpsSdk;
@@ -39,7 +39,7 @@ catch (WsdlHandlerException ex) {
 
 Here is an simple example request:
 
-```Java
+```java
 import NpsSDK.ComplexElement;
 import NpsSDK.ComplexElementArray;
 import NpsSDK.ComplexElementArrayItem;
@@ -73,19 +73,19 @@ catch (WsdlHandlerException ex) {
 
 ```
 
-## Environments
+##  Environments
 
-```Java
+```java
 
 import NpsSDK.WsdlHandlerConfiguration.NpsEnvironment;
 
 ```
 
-## Error handling
+##  Error handling
 
 WsdlHandlerException: This exception is thrown when occurs any error. 
 
-```Java
+```java
 import NpsSDK.WsdlHandlerException;
 
 //Code
@@ -97,11 +97,11 @@ catch (WsdlHandlerException ex) {
 }  
 ```
 
-## Advanced configurations
+##  Advanced configurations
 
 Nps SDK allows you to log what’s happening with you request inside of our SDK, it logs by default to the java console
 
-```Java
+```java
 import NpsSDK.ConsoleLogger;
 import NpsSDK.ILogger;
 import NpsSDK.WsdlHandlerConfiguration;
@@ -113,7 +113,8 @@ WsdlHandlerConfiguration wsdlHandlerConfiguration = new WsdlHandlerConfiguration
 
 ```
 If you prefer the sdk can write the output generated from the logger to the file you provided.
-```Java
+
+```java
 import NpsSDK.FileLogger;
 import NpsSDK.ILogger;
 import NpsSDK.WsdlHandlerConfiguration;
@@ -131,7 +132,7 @@ The LogLevel.Debug level will write information about the request to let develop
 
 you can change the open timeout and the read timeout of the request.
 
-```Java
+```java
 import NpsSDK.ConsoleLogger;
 import NpsSDK.ILogger;
 import NpsSDK.WsdlHandlerConfiguration;
@@ -147,7 +148,7 @@ WsdlHandlerConfiguration wsdlHandlerConfiguration = new WsdlHandlerConfiguration
 
 Proxy configuration
 
-```Java
+```java
 import NpsSDK.ConsoleLogger;
 import NpsSDK.ILogger;
 import NpsSDK.WsdlHandlerConfiguration;
