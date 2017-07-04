@@ -8,8 +8,14 @@ Supports java 6, 7 and 8
 
 ##  How to install
 
-```
-mvn install:install-file -Dfile=path/to/your/nps_sdk.jar -DgroupId=ar.com.nps -DartifactId=nps_sdk -Dpackaging=jar
+Add this dependency to your project's POM:
+
+```xml
+<dependency>
+    <groupId>com.github.ingenico-nps-latam</groupId>
+    <artifactId>nps-sdk-java</artifactId>
+    <version>1.0.15</version>
+</dependency>
 ```
 
 ##  Configuration
