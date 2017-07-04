@@ -1,3 +1,6 @@
 .json
 src/IngenicoSDKTests/
 npssdkjava.iml
+.idea
+nps-sdk-java.iml
+target/
