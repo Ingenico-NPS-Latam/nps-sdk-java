@@ -27,7 +27,7 @@ import groovy.xml.QName;
 
 public class NpsSdk {
 
-	static final String sdkVersion = "Java 1.0.0";
+	static final String sdkVersion = "Java 1.0.9";
 
 	// Sanitize
 
