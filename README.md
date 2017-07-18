@@ -18,6 +18,13 @@ Add this dependency to your project's POM:
 </dependency>
 ```
 
+or add this line to your build.gradle
+
+```bash
+compile 'com.github.ingenico-nps-latam:nps-sdk-java:1.0.15'
+```
+
+
 ##  Configuration
 
 It's a basic configuration of the SDK
