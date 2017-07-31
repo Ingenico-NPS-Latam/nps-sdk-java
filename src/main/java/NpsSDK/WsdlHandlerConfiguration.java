@@ -1,6 +1,10 @@
 package NpsSDK;
 
 import org.apache.http.*;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 
 public class WsdlHandlerConfiguration {	
 	
@@ -17,6 +21,8 @@ public class WsdlHandlerConfiguration {
 	private int openTimeOut;
 	private int readTimeOut;
 	private HttpHost proxy;
+	private CredentialsProvider credentialsProvider;
+	private Boolean ignoreSslValidation;
 	
 	
 	/**	 
@@ -33,7 +39,8 @@ public class WsdlHandlerConfiguration {
 		this.openTimeOut = 100;
 		this.readTimeOut = 0;
 		this.proxy = null;
-		
+		this.credentialsProvider = null;
+		this.ignoreSslValidation = false;		
 	}
 	
 	/**	 
@@ -51,7 +58,8 @@ public class WsdlHandlerConfiguration {
 		this.openTimeOut = 100;
 		this.readTimeOut = 0;
 		this.proxy = null;
-		
+		this.credentialsProvider = null;
+		this.ignoreSslValidation = false;
 	}
 	
 	/**	 
@@ -71,6 +79,8 @@ public class WsdlHandlerConfiguration {
 		this.openTimeOut = openTimeOut;
 		this.readTimeOut = readTimeOut;
 		this.proxy = null;
+		this.credentialsProvider = null;
+		this.ignoreSslValidation = false;
 	}
 	
 	/**	 
@@ -80,17 +90,51 @@ public class WsdlHandlerConfiguration {
 	 * @param  logger Console logger or File logger.
 	 * @param  openTimeOut The number of seconds to wait before the request times out. The default value is 100 seconds.
 	 * @param  readTimeOut The number of seconds to wait before the socket times out. The default value is 0 seconds interpreted as infinite.
-	 * @param  proxy HttpHost proxy.
+	 * @param  url  Proxy url.
+	 * @param  port Proxy port.
+	 * @param  user Proxy user.
+	 * @param  pass Proxy password.
 	 */
-	public WsdlHandlerConfiguration(NpsSDK.ILogger.LogLevel logLevel, NpsEnvironment npsEnvironment, String secretKey, ILogger logger, int openTimeOut, int readTimeOut, HttpHost proxy){
+	public WsdlHandlerConfiguration(NpsSDK.ILogger.LogLevel logLevel, NpsEnvironment npsEnvironment, String secretKey, ILogger logger, int openTimeOut, int readTimeOut, String url, int port, String user, String pass){
 		this.logLevel = logLevel;
 		this.npsEnvironment = npsEnvironment;
 		this.secretKey = secretKey;
 		this.logger = new LogWrapper(logLevel, logger);
 		this.openTimeOut = openTimeOut;
 		this.readTimeOut = readTimeOut;
-		this.proxy = proxy;
-		
+		this.proxy = new HttpHost(url, port);
+		this.credentialsProvider = new BasicCredentialsProvider();
+		UsernamePasswordCredentials credentials	 = new UsernamePasswordCredentials(user, pass);
+		this.credentialsProvider.setCredentials(AuthScope.ANY, credentials);
+		this.ignoreSslValidation = false;
+	}
+	
+	
+	/**	 
+	 * @param  logLevel DEBUG or INFO.
+	 * @param  npsEnvironment sandbox, staging or production.
+	 * @param  secretKey Secret key provided by Nps.
+	 * @param  logger Console logger or File logger.
+	 * @param  openTimeOut The number of seconds to wait before the request times out. The default value is 100 seconds.
+	 * @param  readTimeOut The number of seconds to wait before the socket times out. The default value is 0 seconds interpreted as infinite.
+	 * @param  url  Proxy url.
+	 * @param  port Proxy port.
+	 * @param  user Proxy user.
+	 * @param  pass Proxy password.
+	 * @param  ignoreSslValidation Ignore SSL Certificate validation.
+	 */
+	public WsdlHandlerConfiguration(NpsSDK.ILogger.LogLevel logLevel, NpsEnvironment npsEnvironment, String secretKey, ILogger logger, int openTimeOut, int readTimeOut, String url, int port, String user, String pass, Boolean ignoreSslValidation){
+		this.logLevel = logLevel;
+		this.npsEnvironment = npsEnvironment;
+		this.secretKey = secretKey;
+		this.logger = new LogWrapper(logLevel, logger);
+		this.openTimeOut = openTimeOut;
+		this.readTimeOut = readTimeOut;
+		this.proxy = new HttpHost(url, port);	
+		this.credentialsProvider = new BasicCredentialsProvider();
+		UsernamePasswordCredentials credentials	 = new UsernamePasswordCredentials(user, pass);
+		this.credentialsProvider.setCredentials(AuthScope.ANY, credentials);
+		this.ignoreSslValidation = ignoreSslValidation;
 	}
 	
 	
@@ -121,6 +165,14 @@ public class WsdlHandlerConfiguration {
 	
 	HttpHost getProxy(){
 		return proxy;
+	}
+	
+	CredentialsProvider getCredentialsProvider(){
+		return credentialsProvider;
+	}
+	
+	Boolean getIgnoreSslValidation(){
+		return ignoreSslValidation;
 	}
 		
 	String getServiceUrl() throws WsdlHandlerException{

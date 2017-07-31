@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.SocketTimeoutException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,9 +21,11 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -311,17 +315,49 @@ class ServiceDefinition {
 		String action = url + "/" + service;
 		
 		StringBuffer buf = null;
-
-		CloseableHttpClient httpClient = HttpClients.createDefault();
+		
+		CloseableHttpClient httpClient = null;
+		if (!_wsdlHandlerConfiguration.getIgnoreSslValidation()){
+			if (_wsdlHandlerConfiguration.getCredentialsProvider() == null){
+				httpClient = HttpClientBuilder.create().disableAutomaticRetries().build();
+			}
+			else{
+				httpClient = HttpClientBuilder.create().setDefaultCredentialsProvider(_wsdlHandlerConfiguration.getCredentialsProvider()).disableAutomaticRetries().build();
+			}		
+		}
+		else{			
+			try {
+				if (_wsdlHandlerConfiguration.getCredentialsProvider() == null){
+					httpClient = HttpClientBuilder.create().disableAutomaticRetries().setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy()
+					{
+					    public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException
+					    {
+					        return true;
+					    }
+					}).build()).build();
+				}
+				else{
+					httpClient = HttpClientBuilder.create().setDefaultCredentialsProvider(_wsdlHandlerConfiguration.getCredentialsProvider()).disableAutomaticRetries().setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy()
+					{
+					    public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException
+					    {
+					        return true;
+					    }
+					}).build()).build();
+				}
+			} catch (Exception ex) {
+				throw new WsdlHandlerException(ex);				
+			} 
+		}			
 		
 		int connectionTimeOut = _wsdlHandlerConfiguration.getOpenTimeOut() * 1000;
 		int socketTimeOut = _wsdlHandlerConfiguration.getReadTimeOut() * 1000;	
 
 	    Builder requestConfigBuilder = RequestConfig.custom().setSocketTimeout(socketTimeOut).setConnectTimeout(connectionTimeOut);        
-	    
 		if (_wsdlHandlerConfiguration.getProxy() != null) {
 			requestConfigBuilder.setProxy(_wsdlHandlerConfiguration.getProxy());
 		}			
+		
 		RequestConfig requestConfig = requestConfigBuilder.build();
 		
 		HttpPost httppost = new HttpPost(url);

@@ -8,26 +8,21 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
-import com.predic8.schema.ComplexContent;
-import com.predic8.schema.ModelGroup;
-import com.predic8.schema.SchemaComponent;
-import com.predic8.wsdl.Definitions;
-import com.predic8.wsdl.Input;
-import com.predic8.wsdl.Message;
-import com.predic8.wsdl.Operation;
-import com.predic8.wsdl.Output;
-import com.predic8.wsdl.PortType;
-import com.predic8.wsdl.WSDLParser;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
 
 import NpsSDK.ILogger.LogLevel;
 import NpsSDK.WsdlHandlerConfiguration.NpsEnvironment;
-import groovy.xml.QName;
 
 public class NpsSdk {
 
-	static final String sdkVersion = "Java 1.0.9";
+	static final String sdkVersion = "Java 1.0.0";
 
 	// Sanitize
 
@@ -115,15 +110,16 @@ public class NpsSdk {
 	// Constructor
 
 	public NpsSdk(WsdlHandlerConfiguration wsdlHandlerConfiguration) throws WsdlHandlerException {
-
 		try {
+			
+			
 			if (wsdlHandlerConfiguration.getLogLevel() == LogLevel.DEBUG
 					&& wsdlHandlerConfiguration.getNpsEnvironment() == NpsEnvironment.production) {
 				throw new WsdlHandlerException("LogLevel can't be set to Debug on Production environment");
 			}
 
 			_wsdlHandlerConfiguration = wsdlHandlerConfiguration;
-			
+
 			String wsdlPath = String.format("%1$s.wsdl", _wsdlHandlerConfiguration.getNpsEnvironment().toString());
 			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 			InputStream wsdlStream = classLoader.getResourceAsStream(wsdlPath);
@@ -132,13 +128,16 @@ public class NpsSdk {
 				throw new WsdlHandlerException("Missing local WSDL");
 			}
 
-			WSDLParser parser = new WSDLParser();			
-			Definitions defs = parser.parse(wsdlStream);
 			
-			_types = getTypes(defs);
-			_services = getServices(defs, wsdlHandlerConfiguration);
 			
-			Security.insertProviderAt(new BouncyCastleProvider(),1);			
+			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();			
+			Document document = documentBuilder.parse(wsdlStream);	
+
+			_types = getTypes(document);
+			_services = getServices(document, wsdlHandlerConfiguration);		
+			
+			Security.insertProviderAt(new BouncyCastleProvider(), 1);
 
 		} catch (WsdlHandlerException ex) {
 			throw ex;
@@ -147,113 +146,160 @@ public class NpsSdk {
 		catch (Exception ex) {
 			_wsdlHandlerConfiguration.getLogger().log(LogLevel.DEBUG, ex.getMessage());
 			throw new WsdlHandlerException(ex);
-		}
-
+		}	
 	}
-	
-	private Map<String, ComplexType> getTypes(Definitions defs){
-		Map<String,ComplexType> types = new LinkedHashMap<String, ComplexType>();
 
-		List<com.predic8.schema.ComplexType> complexTypesRead = defs.getTypes().get(0).getAllSchemas().get(0)
-				.getComplexTypes();
-		for (com.predic8.schema.ComplexType complexTypeRead : complexTypesRead) {
+	private Map<String, ComplexType> getTypes(Document document) {
+		Map<String, ComplexType> types = new LinkedHashMap<String, ComplexType>();
+		NodeList complexTypesRead = document.getElementsByTagName("xsd:complexType");
+
+		for (int i = 0; i < complexTypesRead.getLength(); i++) {
+			Node complexTypeRead = complexTypesRead.item(i);
 			NpsSDK.ComplexType complexType = new ComplexType();
-			complexType.setTypeName(complexTypeRead.getName());
-			Boolean isArray = false;
-			if (complexTypeRead.getModel() instanceof ComplexContent) {
-				String typeModel = ((ComplexContent) complexTypeRead.getModel()).getDerivation().getBasePN()
-						.getLocalName();
-				if (typeModel.equals("Array")) {
-					isArray = true;
-				}
-			}
-			complexType.setIsArray(isArray);
-			complexType.setIsMandatory(false);
 
-			if (complexType.isArray() && complexTypeRead.getModel() instanceof ComplexContent) {
-				String typeName = complexTypeRead.getName().replaceAll("ArrayOf_", "");
-				complexType.setTypeName(typeName);
+			if (complexTypeRead.getNodeType() == Node.ELEMENT_NODE) {
+				Element complexTypeElement = (Element) complexTypeRead;
+				
+				complexType.setTypeName(complexTypeElement.getAttribute("name"));
+
+				Boolean isArray = false;
+
+				NodeList complexTypeContent = complexTypeElement.getElementsByTagName("xsd:complexContent");
+				Node complexTypeContentNode = complexTypeContent.item(0);
+				if (complexTypeContent.getLength() > 0 && complexTypeContentNode != null) {
+					Element complexTypeContentElement = (Element) complexTypeContentNode;
+					Element restrictionElement = (Element) complexTypeContentElement.getElementsByTagName("xsd:restriction").item(0);
+					if (restrictionElement.getAttribute("base").indexOf("Array") != -1) {
+						isArray = true;						
+					}
+				}
+
+				complexType.setIsArray(isArray);
+				complexType.setIsMandatory(false);
+				
+				if (complexType.isArray() && complexTypeContent.getLength() > 0 && complexTypeContentNode != null) {
+					String typeName = complexTypeElement.getAttribute("name").replaceAll("ArrayOf_", "");
+					complexType.setTypeName(typeName);
+				}
+
+				outputElements(complexType, complexTypeRead);
+				types.put(complexTypeElement.getAttribute("name"), complexType);
 			}
-			outputElements(complexType, complexTypeRead);
-			types.put(complexTypeRead.getName(), complexType);
+
 		}
 		return types;
 	}
 
-	private List<ServiceDefinition> getServices(Definitions defs, WsdlHandlerConfiguration wsdlHandlerConfiguration) {
+	private List<ServiceDefinition> getServices(Document document, WsdlHandlerConfiguration wsdlHandlerConfiguration) {
 		List<ServiceDefinition> services = new ArrayList<ServiceDefinition>();
-		List<PortType> portTypes = defs.getPortTypes();		
-		for (PortType portType : portTypes) {
-			List<Operation> operations = portType.getOperations();
-			for (Operation operation : operations) {
+		NodeList portTypes = document.getElementsByTagName("portType");
+		
+		
+		Map<String,Element> messageElements = new HashMap<String,Element>();			
+		NodeList messages = document.getElementsByTagName("message");
+		for(int i = 0; i<messages.getLength(); i++){
+			Element messageElement = (Element) messages.item(i);
+			messageElements.put(messageElement.getAttribute("name"), messageElement);
+		}
 
-				ServiceDefinition serviceDefinition = new ServiceDefinition(_wsdlHandlerConfiguration);
-				serviceDefinition.setServiceName(operation.getName());
+		for (int i = 0; i < portTypes.getLength(); i++) {
+			Node portTypeNode = portTypes.item(i);
 
-				Input input = operation.getInput();
+			if (portTypeNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element portTypeElement = (Element) portTypeNode;
+				NodeList operations = portTypeElement.getElementsByTagName("operation");
 
-				if (input != null) {
-					String messageName = input.getMessagePrefixedName().getLocalName();
-					Message message = defs.getMessage(messageName);
-					if (message != null) {
-						serviceDefinition.setInputParameterName(message.getParts().get(0).getName());
-						serviceDefinition.setInputType(message.getParts().get(0).getTypePN().getLocalName());
+				for (int j = 0; j < operations.getLength(); j++) {
+					Node operationNode = operations.item(j);
+					if (portTypeNode.getNodeType() == Node.ELEMENT_NODE) {
+						Element operation = (Element) operationNode;
+						String operationName = operation.getAttribute("name");
+
+						ServiceDefinition serviceDefinition = new ServiceDefinition(_wsdlHandlerConfiguration);
+						serviceDefinition.setServiceName(operationName);
+
+						Element input = ((Element) operation.getElementsByTagName("input").item(0));
+						if (input != null) {
+							String messageName = input.getAttribute("message").replaceAll("tns:", "");								
+							Element part = (Element) messageElements.get(messageName).getElementsByTagName("part").item(0);
+							serviceDefinition.setInputParameterName(part.getAttribute("name"));
+						    serviceDefinition.setInputType(part.getAttribute("type").replaceAll("tns:", ""));
+
+						}
+
+						Element output = ((Element) operation.getElementsByTagName("output").item(0));
+
+						if (output != null) {
+							String messageName = output.getAttribute("message").replaceAll("tns:", "");
+								Element part = (Element) messageElements.get(messageName).getElementsByTagName("part").item(0); 
+								serviceDefinition.setOutputParameterName(part.getAttribute("name"));
+								serviceDefinition.setOutputType(part.getAttribute("type").replaceAll("tns:", ""));
+
+						}
+
+						serviceDefinition.setInput(getTypeDefinition(serviceDefinition.getInputType()));
+						serviceDefinition.setOutput(getTypeDefinition(serviceDefinition.getOutputType()));
+
+						services.add(serviceDefinition);
 					}
 
 				}
 
-				Output output = operation.getOutput();
-				if (output != null) {
-					String messageName = output.getMessagePrefixedName().getLocalName();
-					Message message = defs.getMessage(messageName);
-					if (message != null) {
-						serviceDefinition.setOutputParameterName(message.getParts().get(0).getName());
-						serviceDefinition.setOutputType(message.getParts().get(0).getTypePN().getLocalName());
-					}
-
-				}
-
-				serviceDefinition.setInput(getTypeDefinition(serviceDefinition.getInputType()));
-				serviceDefinition.setOutput(getTypeDefinition(serviceDefinition.getOutputType()));
-
-				services.add(serviceDefinition);
 			}
 		}
+
 		return services;
 	}
 
-	private static void outputElements(NpsSDK.ComplexType complexType, com.predic8.schema.ComplexType complexTypeRead) {
+	private static void outputElements(NpsSDK.ComplexType complexType, Node complexTypeRead) {
 
-		if (!(complexTypeRead.getModel() instanceof ModelGroup)) {
+		Element allElement = (Element) ((Element)complexTypeRead).getElementsByTagName("xsd:all").item(0);
+		if (allElement == null){
 			return;
 		}
-		List<SchemaComponent> components = ((ModelGroup) complexTypeRead.getModel()).getParticles();
-		for (SchemaComponent component : components) {
-			if (component.getName() == null || component.getName().isEmpty()) {
-				continue;
-			}
+		
+		NodeList elementNodes = allElement.getElementsByTagName("xsd:element");
 
-			NpsSDK.Attribute attribute = new Attribute();
-			attribute.setAttributeName(component.getName());
-			attribute.setAttributeType(((QName) component.getProperty("type")).getLocalPart());
-			Boolean isMandatory = Integer.parseInt(((String) component.getProperty("minOccurs"))) > 0;
-			attribute.setIsMandatory(isMandatory);
-			complexType.addAttribute(attribute);
+		for (int i = 0; i < elementNodes.getLength(); i++) {
+			Node elementNode = elementNodes.item(i);
+
+			if (elementNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element element = (Element) elementNode;
+				String elementName = element.getAttribute("name");
+				String elementType = element.getAttribute("type").split(":")[1];
+				
+				String elementMinOccurs = element.getAttribute("minOccurs");
+				if (elementName == null || elementName.isEmpty()) {
+					continue;
+				}
+				
+				if (elementMinOccurs == null || elementMinOccurs.isEmpty()) {
+					elementMinOccurs = "0";
+				}
+
+				NpsSDK.Attribute attribute = new Attribute();
+				attribute.setAttributeName(elementName);
+				attribute.setAttributeType(elementType);
+				
+				Boolean isMandatory = Integer.parseInt(elementMinOccurs) > 0;
+				attribute.setIsMandatory(isMandatory);
+				complexType.addAttribute(attribute);
+
+			}
 		}
 
 	}
 
-	private Node getTypeDefinition(String typeName) {
+	private NpsSDK.Node getTypeDefinition(String typeName) {
 		return getTypeDefinition("", typeName);
 	}
 
-	private Node getTypeDefinition(String nodeName, String nodeType) {
+	private NpsSDK.Node getTypeDefinition(String nodeName, String nodeType) {
 		ComplexType complexType = getComplexType(nodeType);
 		if (complexType == null) {
 			return null;
 		}
-
-		Node node = new Node();
+		NpsSDK.Node node = new NpsSDK.Node();
 		node.setIsArray(complexType.isArray());
 		node.setIsMandatory(complexType.isMandatory());
 		node.setNodeName(nodeName);
@@ -262,11 +308,12 @@ public class NpsSdk {
 		node.setIsSimpleType(false);
 
 		for (Attribute attribute : complexType.getAttributes()) {
-			Node attributeDefinition = getTypeDefinition(attribute.getAttributeName(), attribute.getAttributeType());
+			NpsSDK.Node attributeDefinition = getTypeDefinition(attribute.getAttributeName(),
+					attribute.getAttributeType());
 			if (attributeDefinition != null) {
 				node.addChild(attributeDefinition);
 			} else {
-				Node attributeNode = new Node();
+				NpsSDK.Node attributeNode = new NpsSDK.Node();
 				attributeNode.setIsMandatory(attribute.isMandatory());
 				attributeNode.setNodeName(attribute.getAttributeName());
 				attributeNode.setIsArray(false);

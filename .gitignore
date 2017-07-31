@@ -2,3 +2,15 @@
 nps-sdk-java.iml
 target/
 mykey.asc
+bin/
+resources/
+src/HomeMadeTestRunner.java
+src/IngenicoSDKTests/
+src/NpsSDK/
+src/NpsSDKTests/
+src/SdkHomeMadeTest.java
+src/WsdlParser/
+src/test/java/test.java
+src/test/java/testTest.java
+src/test/java/HomeMadeTestRunner.java
+src/test/java/SdkHomeMadeTest.java
