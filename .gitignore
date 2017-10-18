@@ -3,7 +3,6 @@ nps-sdk-java.iml
 target/
 mykey.asc
 bin/
-resources/
 src/HomeMadeTestRunner.java
 src/IngenicoSDKTests/
 src/NpsSDK/
