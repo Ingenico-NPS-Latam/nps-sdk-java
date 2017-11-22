@@ -214,7 +214,7 @@ class ServiceDefinition {
 
 	private void validateMissingField(BaseElement data, List<Node> nodeChildren, String path, int nodeCounter,
 			List<String> errors) throws WsdlHandlerException {
-		if (nodeChildren.get(nodeCounter).isMandatory()) {
+		if (nodeChildren.get(nodeCounter).isMandatory() && !nodeChildren.get(nodeCounter).getNodeName().equals("psp_SecureHash")) {
 			errors.add("Missing field: " + path + nodeChildren.get(nodeCounter).getNodeName());
 		}
 
