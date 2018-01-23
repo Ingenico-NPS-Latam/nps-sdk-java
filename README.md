@@ -14,7 +14,7 @@ Add this dependency to your project's POM:
 <dependency>
     <groupId>com.github.ingenico-nps-latam</groupId>
     <artifactId>nps-sdk-java</artifactId>
-    <version>1.0.20</version>
+    <version>1.0.21</version>
 </dependency>
 ```
 
