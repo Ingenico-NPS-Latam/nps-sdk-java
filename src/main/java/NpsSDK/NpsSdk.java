@@ -22,7 +22,7 @@ import NpsSDK.WsdlHandlerConfiguration.NpsEnvironment;
 
 public class NpsSdk {
 
-	static final String sdkVersion = "Java 1.0.0";
+	static final String sdkVersion = "Java 1.0.22";
 
 	// Sanitize
 
