@@ -149,9 +149,8 @@ The LogLevel.Debug level will write information about the request to let develop
 
 ### Timeout 
 
-```
 
-you can change the open timeout and the read timeout of the request.
+You can change the open timeout and the read timeout of the request
 
 ```java
 import NpsSDK.ConsoleLogger;
