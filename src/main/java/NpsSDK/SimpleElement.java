@@ -6,11 +6,18 @@ import java.util.List;
 public class SimpleElement extends BaseElement
 {
 	private String value;
-	
+
+	private String escapeSpecialCharacters(String value){
+		value = value.replace("&", "&amp;");
+		value = value.replace("<", "&lt;");
+		value = value.replace(">", "&gt;");
+		return value;
+	}
+
 	@Override
 	public String serialize() {
-		return String.format("<%1$s>%2$s</%1$s>", this.getName(), value);
-	}	
+		return String.format("<%1$s>%2$s</%1$s>", this.getName(), this.escapeSpecialCharacters(value));
+	}
 	
 	void trim(int maxLength){
 		if (value.length() > maxLength){

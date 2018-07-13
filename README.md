@@ -14,7 +14,7 @@ Add this dependency to your project's POM:
 <dependency>
     <groupId>com.github.ingenico-nps-latam</groupId>
     <artifactId>nps-sdk-java</artifactId>
-    <version>1.0.25</version>
+    <version>1.0.26</version>
 </dependency>
 ```
 
@@ -125,9 +125,6 @@ ILogger consoleLogger = new ConsoleLogger();
 WsdlHandlerConfiguration wsdlHandlerConfiguration = new WsdlHandlerConfiguration(LogLevel.DEBUG, NpsEnvironment.sandbox, "_YOUR_SECRET_KEY_", consoleLogger);      
 
 ```
-
-### Logging
-
 If you prefer the sdk can write the output generated from the logger to the file you provided.
 
 ```java
@@ -141,16 +138,12 @@ ILogger fileLogger = new FileLogger("path/to/your/file.log");
 WsdlHandlerConfiguration wsdlHandlerConfiguration = new WsdlHandlerConfiguration(LogLevel.DEBUG, NpsEnvironment.sandbox, "_YOUR_SECRET_KEY_", fileLogger);      
 ```
 
-### LogLevel
-
 The LogLevel.Info level will write concise information of the request and will mask sensitive data of the request. 
 The LogLevel.Debug level will write information about the request to let developers debug it in a more detailed way.
 
+```
 
-### Timeout 
-
-
-You can change the open timeout and the read timeout of the request
+you can change the open timeout and the read timeout of the request.
 
 ```java
 import NpsSDK.ConsoleLogger;
@@ -161,12 +154,12 @@ import NpsSDK.WsdlHandlerConfiguration.NpsEnvironment;
 
 ILogger consoleLogger = new ConsoleLogger();
 
-int openTimeOut = 10;
+int openTimeOut = 60;
 int readTimeOut = 60;
 WsdlHandlerConfiguration wsdlHandlerConfiguration = new WsdlHandlerConfiguration(LogLevel.DEBUG, NpsEnvironment.sandbox, "_YOUR_SECRET_KEY_", consoleLogger,openTimeOut,readTimeOut);      
 ```
 
-### Proxy configuration
+Proxy configuration
 
 ```java
 import NpsSDK.ConsoleLogger;

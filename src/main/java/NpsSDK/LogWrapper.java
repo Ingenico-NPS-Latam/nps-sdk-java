@@ -49,7 +49,7 @@ class LogWrapper {
 		_logger.log(message);
 	}
 
-	public void logRequest(LogLevel logLevel, String request) {
+	public void logRequest(LogLevel logLevel, String request) throws WsdlHandlerException{
 		if (_logger == null || logLevel.ordinal() < _minimumLevel.ordinal()) {
 			return;
 		}
@@ -69,29 +69,26 @@ class LogWrapper {
 
 	}
 
-	public void logResponse(LogLevel logLevel, String response) {
+	public void logResponse(LogLevel logLevel, String response) throws WsdlHandlerException{
 		log(logLevel, "Response: " + System.getProperty("line.separator") + Beautify(response));
 	}
 
-	private static String Beautify(String xml) {
+	private static String Beautify(String xml) throws WsdlHandlerException{
 
 		StreamResult result = null;
 		try {
 			DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			Document doc = documentBuilder.parse(new InputSource(new StringReader(xml)));
-
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 			result = new StreamResult(new StringWriter());
 			DOMSource source = new DOMSource(doc);
 			transformer.transform(source, result);
-
 		} catch (Exception e) {
+			throw new WsdlHandlerException(e);
 		}
-
 		return result.getWriter().toString();
-
 	}
 
 }
