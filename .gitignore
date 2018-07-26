@@ -1,4 +1,5 @@
 .idea
+*.asc
 nps-sdk-java.iml
 target/
 mykey.asc
