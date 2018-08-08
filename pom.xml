@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.ingenico-nps-latam</groupId>
     <artifactId>nps-sdk-java</artifactId>
-    <version></version>
+    <version>1.0.32</version>
     <packaging>jar</packaging>
     <name>NPS SDK Java</name>
     <description>NPS SDK Java</description>
@@ -115,8 +115,8 @@
                 <configuration>
                     <verbose>true</verbose>
                     <fork>true</fork>
-                    <executable>${JAVA_HOME}/bin/javac</executable>
-                    <compilerVersion>1.6</compilerVersion>
+                    <executable>$JAVA_HOME/bin/javac</executable>
+                    <compilerVersion>1.8</compilerVersion>
                 </configuration>
             </plugin>
             <plugin>

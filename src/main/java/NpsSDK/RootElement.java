@@ -21,7 +21,7 @@ public class RootElement extends ComplexElement{
 
     	for(BaseElement element : this.getChildren()){
     		if (element instanceof SimpleElement){
-    			simpleElements.add((SimpleElement) element); 
+    			simpleElements.add((SimpleElement) element);
     		}    		
     	}
     	

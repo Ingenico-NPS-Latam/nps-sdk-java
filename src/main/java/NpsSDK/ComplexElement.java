@@ -1,11 +1,8 @@
 package NpsSDK;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.bouncycastle.jcajce.provider.symmetric.ARC4;
+
+import java.util.*;
 
 
 public class ComplexElement extends BaseElement
@@ -89,6 +86,36 @@ public class ComplexElement extends BaseElement
     	}
     	return null;
     }
+
+	private void removeElementFromMap(String index) {
+		if(_childrenHash.containsKey(index)) {
+			_childrenHash.remove(index);
+		}
+	}
+
+	private Boolean isElementInList(String index) {
+		for(BaseElement child: this.getChildren()) {
+			if(child.getName().equals(index)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void removeElementFromList(String index) {
+		if(isElementInList(index)) {
+			for (Iterator<BaseElement> iterator = this.getChildren().listIterator(); iterator.hasNext(); ) {
+				if (iterator.next().getName().equals(index)) {
+					iterator.remove();
+				}
+			}
+		}
+	}
+
+    public void removeElement(String index) {
+		this.removeElementFromMap(index);
+		this.removeElementFromList(index);
+	}
     
     public <T extends BaseElement> T getChild(String index, Class<T> clazz){
     	BaseElement child = this.getElement(index); 

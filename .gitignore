@@ -16,3 +16,5 @@ src/test/java/HomeMadeTestRunner.java
 src/test/java/SdkHomeMadeTest.java
 src/main/java/HomeMadeTestRunner.java
 src/main/java/SdkHomeMadeTest.java
+src/main/java/NpsSDK/Test.java
+src/main/main.iml

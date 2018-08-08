@@ -22,7 +22,7 @@ import NpsSDK.WsdlHandlerConfiguration.NpsEnvironment;
 
 public class NpsSdk {
 
-	static final String sdkVersion = "Java SDK Version: 1.0.32";
+	static final String sdkVersion = "Java SDK Version: 1.0.33";
 
 	// Sanitize
 
@@ -111,8 +111,7 @@ public class NpsSdk {
 
 	public NpsSdk(WsdlHandlerConfiguration wsdlHandlerConfiguration) throws WsdlHandlerException {
 		try {
-			
-			
+
 			if (wsdlHandlerConfiguration.getLogLevel() == LogLevel.DEBUG
 					&& wsdlHandlerConfiguration.getNpsEnvironment() == NpsEnvironment.production) {
 				throw new WsdlHandlerException("LogLevel can't be set to Debug on Production environment");
@@ -128,8 +127,6 @@ public class NpsSdk {
 				throw new WsdlHandlerException("Missing local WSDL");
 			}
 
-			
-			
 			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();			
 			Document document = documentBuilder.parse(wsdlStream);	
@@ -242,9 +239,7 @@ public class NpsSdk {
 
 						services.add(serviceDefinition);
 					}
-
 				}
-
 			}
 		}
 
@@ -341,6 +336,8 @@ public class NpsSdk {
 		}
 
 		try {
+			data.removeElement("psp_SecureHash");
+
 			return serviceDefinition.call(data);
 		} catch (Exception ex) {
 			_wsdlHandlerConfiguration.getLogger().log(LogLevel.DEBUG, ex.getMessage());

@@ -128,6 +128,7 @@ class ServiceDefinition {
 			}
 		});
 		int dataCounter = 0, nodeCounter = 0;
+
 		while (nodeCounter < nodeChildren.size() || dataCounter < dataChildren.size()) {
 
 			if (dataCounter > 0 && dataCounter < dataChildren.size()
@@ -147,8 +148,10 @@ class ServiceDefinition {
 				nodeCounter++;
 				continue;
 			}
+
 			if (compare > 0) {
 				data.getChildren().remove(dataChildren.get(dataCounter));
+				System.out.println(data.serialize());
 				dataCounter++;
 				continue;
 			}
