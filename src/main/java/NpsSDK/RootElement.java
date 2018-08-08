@@ -78,6 +78,6 @@ public class RootElement extends ComplexElement{
         StringBuilder sBuilder = new StringBuilder();
         for (byte b : data) { sBuilder.append(String.format("%02X", b)); }
         return sBuilder.toString().toLowerCase();
-    }  
+    }
 
 }

@@ -112,11 +112,17 @@ public class ComplexElement extends BaseElement
 		}
 	}
 
-    public void removeElement(String index) {
-		this.removeElementFromMap(index);
-		this.removeElementFromList(index);
+
+	public void removeSecureHash(){
+		for(Iterator<String> iterator = _childrenHash.keySet().iterator(); iterator.hasNext();) {
+			String key = iterator.next();
+			if(key.toLowerCase().equals("psp_securehash")) {
+				this.removeElementFromList(key);
+				iterator.remove();
+			}
+		}
 	}
-    
+
     public <T extends BaseElement> T getChild(String index, Class<T> clazz){
     	BaseElement child = this.getElement(index); 
     	

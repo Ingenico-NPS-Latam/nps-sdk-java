@@ -110,6 +110,26 @@ class ServiceDefinition {
 		return validate(data, input, "", errorMessage);
 	}
 
+	private void changeNodePositionToLast(List<Node> nodeList, Node node) {
+        nodeList.remove(node);
+        nodeList.add(node);
+    }
+
+
+	private void changeSecureHashNodePositionIfExists(List<Node> nodeChildren) {
+        Node secureHashNode = null;
+
+        for(Node nodeChild: nodeChildren) {
+            if(nodeChild.getNodeName().equals("psp_SecureHash")){
+                secureHashNode = nodeChild;
+            }
+        }
+
+        if(secureHashNode != null) {
+            this.changeNodePositionToLast(nodeChildren, secureHashNode);
+        }
+    }
+
 	private Boolean validate(BaseElement data, Node parentNode, String path, List<String> errors)
 			throws WsdlHandlerException {
 		List<BaseElement> dataChildren = new ArrayList<BaseElement>(data.getChildren());
@@ -127,6 +147,9 @@ class ServiceDefinition {
 				return node1.getNodeName().compareTo(node2.getNodeName());
 			}
 		});
+
+        this.changeSecureHashNodePositionIfExists(nodeChildren);
+
 		int dataCounter = 0, nodeCounter = 0;
 
 		while (nodeCounter < nodeChildren.size() || dataCounter < dataChildren.size()) {
@@ -151,7 +174,6 @@ class ServiceDefinition {
 
 			if (compare > 0) {
 				data.getChildren().remove(dataChildren.get(dataCounter));
-				System.out.println(data.serialize());
 				dataCounter++;
 				continue;
 			}
@@ -322,7 +344,7 @@ class ServiceDefinition {
 		CloseableHttpClient httpClient = null;
 		if (!_wsdlHandlerConfiguration.getIgnoreSslValidation()){
 			if (_wsdlHandlerConfiguration.getCredentialsProvider() == null){
-				httpClient = HttpClientBuilder.create().disableAutomaticRetries().build();
+                    httpClient = HttpClientBuilder.create().disableAutomaticRetries().build();
 			}
 			else{
 				httpClient = HttpClientBuilder.create().setDefaultCredentialsProvider(_wsdlHandlerConfiguration.getCredentialsProvider()).disableAutomaticRetries().build();

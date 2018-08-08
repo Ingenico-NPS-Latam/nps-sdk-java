@@ -22,7 +22,7 @@ import NpsSDK.WsdlHandlerConfiguration.NpsEnvironment;
 
 public class NpsSdk {
 
-	static final String sdkVersion = "Java SDK Version: 1.0.33";
+	static final String sdkVersion = "Java SDK Version: 1.0.34";
 
 	// Sanitize
 
@@ -336,7 +336,7 @@ public class NpsSdk {
 		}
 
 		try {
-			data.removeElement("psp_SecureHash");
+			data.removeSecureHash();
 
 			return serviceDefinition.call(data);
 		} catch (Exception ex) {

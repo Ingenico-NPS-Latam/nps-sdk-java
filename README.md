@@ -14,14 +14,14 @@ Add this dependency to your project's POM:
 <dependency>
     <groupId>com.github.ingenico-nps-latam</groupId>
     <artifactId>nps-sdk-java</artifactId>
-    <version>1.0.33</version>
+    <version>1.0.34</version>
 </dependency>
 ```
 
 or add this line to your build.gradle
 
 ```bash
-compile 'com.github.ingenico-nps-latam:nps-sdk-java:1.0.33'
+compile 'com.github.ingenico-nps-latam:nps-sdk-java:1.0.34'
 ```
 
 
