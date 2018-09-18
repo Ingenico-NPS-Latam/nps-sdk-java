@@ -158,7 +158,7 @@ import NpsSDK.WsdlHandlerConfiguration.NpsEnvironment;
 
 ILogger consoleLogger = new ConsoleLogger();
 
-int openTimeOut = 60;
+int openTimeOut = 10;
 int readTimeOut = 60;
 WsdlHandlerConfiguration wsdlHandlerConfiguration = new WsdlHandlerConfiguration(LogLevel.DEBUG, NpsEnvironment.sandbox, "_YOUR_SECRET_KEY_", consoleLogger,openTimeOut,readTimeOut);      
 ```
@@ -174,7 +174,7 @@ import NpsSDK.WsdlHandlerConfiguration.NpsEnvironment;
 
 ILogger consoleLogger = new ConsoleLogger();
 
-int openTimeOut = 60;
+int openTimeOut = 10;
 int readTimeOut = 60;
 HttpHost proxy = new HttpHost("PROXY HOST", 8080);
 WsdlHandlerConfiguration wsdlHandlerConfiguration = new WsdlHandlerConfiguration(LogLevel.DEBUG, NpsEnvironment.sandbox, "_YOUR_SECRET_KEY_", consoleLogger,openTimeOut,readTimeOut,proxy);      
