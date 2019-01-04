@@ -173,6 +173,7 @@ class ServiceDefinition {
 			}
 
 			if (compare > 0) {
+				System.out.println("INFO: " + dataChildren.get(dataCounter).getName() + " was removed from the request because it does not belong to the method sent.");
 				data.getChildren().remove(dataChildren.get(dataCounter));
 				dataCounter++;
 				continue;
@@ -344,7 +345,7 @@ class ServiceDefinition {
 		CloseableHttpClient httpClient = null;
 		if (!_wsdlHandlerConfiguration.getIgnoreSslValidation()){
 			if (_wsdlHandlerConfiguration.getCredentialsProvider() == null){
-                    httpClient = HttpClientBuilder.create().disableAutomaticRetries().build();
+				httpClient = HttpClientBuilder.create().disableAutomaticRetries().build();
 			}
 			else{
 				httpClient = HttpClientBuilder.create().setDefaultCredentialsProvider(_wsdlHandlerConfiguration.getCredentialsProvider()).disableAutomaticRetries().build();

@@ -1,5 +1,9 @@
 package NpsSDK;
 
+import org.apache.commons.codec.binary.Hex;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -51,9 +55,9 @@ public class RootElement extends ComplexElement{
 		return serial;
 	}
 
-	
-	public String secureHash(String secretKey) throws WsdlHandlerException { 
-		return this.getMd5Hash(this.getSecureHashConcatenatedValues() + secretKey); 
+	public String secureHash(String secretKey) throws WsdlHandlerException {
+		char[] secure_hash = this.getHmac256Hash(secretKey);
+		return String.valueOf(secure_hash);
 	}
 
     private static MessageDigest getMessageDigest() throws WsdlHandlerException{
@@ -68,7 +72,7 @@ public class RootElement extends ComplexElement{
     }
     
     private String getMd5Hash(String input) throws WsdlHandlerException
-    {    	
+    {
 	    byte[] data = null;
 		try {
 			data = getMessageDigest().digest(input.getBytes("UTF-8"));
@@ -80,4 +84,29 @@ public class RootElement extends ComplexElement{
         return sBuilder.toString().toLowerCase();
     }
 
+    private char[] getHmac256Hash(String secretKey) {
+    	byte[] hash = null;
+    	try {
+    		Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+			SecretKeySpec secret_key = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256");
+			sha256_HMAC.init(secret_key);
+			hash = sha256_HMAC.doFinal(this.getSecureHashConcatenatedValues().getBytes());
+		} catch (Exception e) {
+    		System.out.println(e);
+		}
+		return Hex.encodeHex(hash);
+	}
+
+	private char[] getHmac512Hash(String secretKey) {
+		byte[] hash = null;
+		try {
+			Mac sha512_HMAC = Mac.getInstance("HmacSHA512");
+			SecretKeySpec secret_key = new SecretKeySpec(secretKey.getBytes(), "HmacSHA512");
+			sha512_HMAC.init(secret_key);
+			hash = sha512_HMAC.doFinal(this.getSecureHashConcatenatedValues().getBytes());
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return Hex.encodeHex(hash);
+	}
 }
